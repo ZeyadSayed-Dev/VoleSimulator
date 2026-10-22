@@ -1,0 +1,15 @@
+;----------------------------------------------------------
+;Vole Machine Program
+;Purpose: Load three numbers (3, 7 and 9), add them,
+;and disply the result (19) on the screen.
+;----------------------------------------------------------
+
+2003	; R0=3
+2107	; R1=7
+2209	; R2=9
+5301	; R3=R0+R1
+5423	; R4=R2+R3
+34FF	; Store R4 Value to FF for displaying on screen
+C000	; Halt
+
+

@@ -1,0 +1,14 @@
+;----------------------------------------------------------
+;Vole Machine Program
+;Purpose:Load two numbers, compare them,
+;and display 1 if equal, 0 if not equal.
+;----------------------------------------------------------
+2005	; R0 = 5
+2105	; R1 = 5
+B10C	; If R1 == R0, jump to address 0C
+2000	; R0 = 00 (not equal)
+30FF	; Display 0
+C000	; Halt
+2001	; R0 = 1 (equal)
+30FF	; Display 1
+C000	; Halt
