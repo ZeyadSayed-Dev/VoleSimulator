@@ -1,0 +1,86 @@
+@startuml
+title Vole Machine Simulator - Gemini
+
+skinparam classAttributeIconSize 0
+
+class Menu {
+    + start()
+    - showMenu()
+    - displayState()
+}
+
+class VoleMachine {
+    - running: boolean
+    + loadProgram(fileName, startAddress)
+    + run()
+    + step()
+    + reset()
+    + halt()
+}
+
+class RegisterFile {
+    - registers: byte[16]
+    + read(registerIndex)
+    + write(registerIndex, value)
+    + reset()
+}
+
+class Memory {
+    - cells: byte[256]
+    + read(address)
+    + write(address, value)
+    + clear()
+    + loadProgram(program)
+}
+
+class ControlUnit {
+    - pc: int
+    - ir: int
+    + fetch()
+    + validate(instruction): boolean
+    + decode(rawInstruction): Instruction
+    + execute(instruction)
+    + updatePC()
+}
+
+class ALU {
+    + addInteger(a, b)
+    + addFloatingPoint(a, b)
+    + bitwiseAND(a, b)
+    + bitwiseOR(a, b)
+    + bitwiseXOR(a, b)
+    + rotateRight(value, count)
+}
+
+class Instruction {
+    - opcode: String
+    - operand1: String
+    - operand2: String
+    - operand3: String
+    + getOpcode()
+    + getOperands()
+    + execute(controlUnit)
+}
+
+class InputOutput {
+    - inputBuffer: String
+    - outputBuffer: String
+    + readInput()
+    + display(value)
+    + clearOutput()
+}
+
+Menu --> VoleMachine
+
+VoleMachine *-- RegisterFile
+VoleMachine *-- Memory
+VoleMachine *-- ControlUnit
+VoleMachine *-- InputOutput
+VoleMachine *-- ALU
+
+ControlUnit --> Memory : fetches instructions
+ControlUnit --> RegisterFile : reads and writes
+ControlUnit --> ALU : requests operations
+ControlUnit --> InputOutput : handles I/O
+ControlUnit ..> Instruction : decodes and executes
+@enduml
