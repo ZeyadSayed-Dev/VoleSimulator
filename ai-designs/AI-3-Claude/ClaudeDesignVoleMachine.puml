@@ -1,0 +1,147 @@
+@startuml
+title Vole Machine Simulator - claude 
+
+skinparam classAttributeIconSize 0
+
+class Menu {
+    + start()
+    - showMenu()
+    - displayState()
+}
+
+class VoleMachine {
+    - running: boolean
+    + loadProgram(fileName, startAddress)
+    + run()
+    + step()
+    + reset()
+    + halt()
+}
+
+class RegisterFile {
+    - registers: byte[16]
+    + read(registerIndex)
+    + write(registerIndex, value)
+    + reset()
+}
+
+class Memory {
+    - cells: byte[256]
+    + read(address)
+    + write(address, value)
+    + clear()
+    + loadProgram(program)
+}
+
+class ControlUnit {
+    - pc: int
+    - ir: int
+    + fetch()
+    + validate(instruction): boolean
+    + decode(rawInstruction): Instruction
+    + execute(instruction)
+    + updatePC()
+}
+
+class ALU {
+    + addInteger(a, b)
+    + addFloatingPoint(a, b)
+    + bitwiseAND(a, b)
+    + bitwiseOR(a, b)
+    + bitwiseXOR(a, b)
+    + rotateRight(value, count)
+}
+
+class Instruction {
+    - opcode: String
+    - operand1: String
+    - operand2: String
+    - operand3: String
+    + getOpcode()
+    + getOperands()
+    + execute(controlUnit)
+}
+
+class LoadFromMemory {
+    + execute(controlUnit)
+}
+
+class LoadImmediate {
+    + execute(controlUnit)
+}
+
+class Store {
+    + execute(controlUnit)
+}
+
+class Move {
+    + execute(controlUnit)
+}
+
+class AddInteger {
+    + execute(controlUnit)
+}
+
+class AddFloatingPoint {
+    + execute(controlUnit)
+}
+
+class BitwiseOR {
+    + execute(controlUnit)
+}
+
+class BitwiseAND {
+    + execute(controlUnit)
+}
+
+class BitwiseXOR {
+    + execute(controlUnit)
+}
+
+class RotateRight {
+    + execute(controlUnit)
+}
+
+class Jump {
+    + execute(controlUnit)
+}
+
+class Halt {
+    + execute(controlUnit)
+}
+
+class InputOutput {
+    - inputBuffer: String
+    - outputBuffer: String
+    + readInput()
+    + display(value)
+    + clearOutput()
+}
+
+Menu --> VoleMachine
+
+VoleMachine *-- RegisterFile
+VoleMachine *-- Memory
+VoleMachine *-- ControlUnit
+VoleMachine *-- InputOutput
+VoleMachine *-- ALU
+
+ControlUnit ..> Instruction : decodes and validates
+ControlUnit --> Memory : fetches instructions
+ControlUnit --> RegisterFile : reads and writes
+ControlUnit --> ALU : requests operations
+ControlUnit --> InputOutput : handles I/O
+
+Instruction <|-- LoadFromMemory
+Instruction <|-- LoadImmediate
+Instruction <|-- Store
+Instruction <|-- Move
+Instruction <|-- AddInteger
+Instruction <|-- AddFloatingPoint
+Instruction <|-- BitwiseOR
+Instruction <|-- BitwiseAND
+Instruction <|-- BitwiseXOR
+Instruction <|-- RotateRight
+Instruction <|-- Jump
+Instruction <|-- Halt
+@enduml
