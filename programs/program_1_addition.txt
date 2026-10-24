@@ -1,7 +1,7 @@
 ;----------------------------------------------------------
 ;Vole Machine Program
 ;Purpose: Load three numbers (3, 7 and 9), add them,
-;and disply the result (19) on the screen.
+;and display the result (19) on the screen.
 ;----------------------------------------------------------
 
 2003	; R0=3
