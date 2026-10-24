@@ -1,0 +1,97 @@
+@startuml
+
+title Vole Machine Simulator - ChatGPT’s model
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+class VoleMachine {
+    - running: boolean
+    + loadProgram(program, startAddress)
+    + run()
+    + step()
+    + reset()
+    + halt()
+    + editRegister(index, value)
+    + editMemory(address, value)
+}
+
+class RegisterFile {
+    - registers: byte[16]
+    + read(index): byte
+    + write(index, value): void
+    + reset(): void
+}
+
+class Memory {
+    - cells: byte[256]
+    + read(address): byte
+    + write(address, value): void
+    + clear(): void
+    + loadProgram(program, startAddress)
+    + validateStartAddress(address): boolean
+}
+
+class ControlUnit {
+    - pc: int
+    - ir: int
+    + fetch(): int
+    + validate(instruction): boolean
+    + decode(rawInstruction): Instruction
+    + execute(instruction): void
+}
+
+class ALU {
+    + addInteger(a, b)
+    + addFloatingPoint(a, b)
+    + bitwiseAND(a, b)
+    + bitwiseOR(a, b)
+    + bitwiseXOR(a, b)
+    + rotateRight(value, count)
+}
+
+class Instruction {
+    - opcode: String
+    - operand1: String
+    - operand2: String
+    - operand3: String
+    + getOpcode(): String
+    + getOperands()
+}
+
+class InputOutput {
+    - inputBuffer: String
+    - outputBuffer: String
+    + readInput(): String
+    + display(value): void
+    + displayMachineState(): void
+}
+
+class UserInterface {
+    + showMenu(): void
+    + startExecution(): void
+    + waitForEnter(): void
+    + askContinueOrExit(): boolean
+}
+
+class ProgramLoader {
+    + readProgramFromFile(filePath): String
+}
+
+VoleMachine *-- RegisterFile
+VoleMachine *-- Memory
+VoleMachine *-- ControlUnit
+VoleMachine *-- InputOutput
+
+ControlUnit --> Memory
+ControlUnit --> RegisterFile
+ControlUnit --> ALU
+ControlUnit ..> Instruction
+
+UserInterface --> VoleMachine
+UserInterface --> ProgramLoader
+UserInterface --> InputOutput
+
+ProgramLoader ..> Memory : supplies program
+
+@enduml
