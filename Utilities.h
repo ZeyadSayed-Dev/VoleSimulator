@@ -7,10 +7,10 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
-
+using namespace std;
 class OutputAndInput {
-    std::string input;
-    std::string output;
+    string input;
+    string output;
 
 public:
     void write(const std::string& out);
