@@ -13,14 +13,14 @@ class OutputAndInput {
     string output;
 
 public:
-    void write(const std::string& out);
-    std::string read();
+    void write(const string& out);
+    string read();
     void clear();
 };
 
 class ProgramLoader {
 public:
-    void loadProgram(IMethodOperations& storage, const std::vector<uint8_t>& programBytes, int startAddress = 0);
+    void loadProgram(IMethodOperations& storage, const vector<uint8_t>& programBytes, int startAddress = 0);
     void clear(IMethodOperations& storage);
 };
 
