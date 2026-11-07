@@ -10,53 +10,66 @@ class InstructionFactory
 public:
     Instruction *getInstruction(const std::string &code)
     {
+        static LoadFromMemory loadFromMemory;
+        static LoadImmediate loadImmediate;
+        static Store store;
+        static Move move;
+        static AddInteger addInteger;
+        static AddFloatingPoint addFloatingPoint;
+        static BitwiseOR bitwiseOR;
+        static BitwiseAND bitwiseAND;
+        static BitwiseXOR bitwiseXOR;
+        static RotateRight rotateRight;
+        static Jump jump;
+        static Halt halt;
+
         if (code == "1")
         {
-            return new LoadFromMemory();
+            return &loadFromMemory;
         }
-        else if (code == "2")
+        if (code == "2")
         {
-            return new LoadImmediate();
+            return &loadImmediate;
         }
-        else if (code == "3")
+        if (code == "3")
         {
-            return new Store();
+            return &store;
         }
-        else if (code == "4")
+        if (code == "4")
         {
-            return new Move();
+            return &move;
         }
-        else if (code == "5")
+        if (code == "5")
         {
-            return new AddInteger();
+            return &addInteger;
         }
-        else if (code == "6")
+        if (code == "6")
         {
-            return new AddFloatingPoint();
+            return &addFloatingPoint;
         }
-        else if (code == "7")
+        if (code == "7")
         {
-            return new BitwiseOR();
+            return &bitwiseOR;
         }
-        else if (code == "8")
+        if (code == "8")
         {
-            return new BitwiseAND();
+            return &bitwiseAND;
         }
-        else if (code == "9")
+        if (code == "9")
         {
-            return new BitwiseXOR();
+            return &bitwiseXOR;
         }
-        else if (code == "A" || code == "a")
+        if (code == "A" || code == "a")
         {
-            return new RotateRight();
+            return &rotateRight;
         }
-        else if (code == "B" || code == "b")
+        if (code == "B" || code == "b")
         {
-            return new Jump();
+            return &jump;
         }
-        else if (code == "C" || code == "c")
+        if (code == "C" || code == "c")
         {
-            return new Halt();
+            return &halt;
         }
 
         return nullptr;
