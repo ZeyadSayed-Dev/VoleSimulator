@@ -15,7 +15,9 @@ namespace
 
 Menu::Menu()
     : machine(),
-      entryAddress(0)
+      entryAddress(0),
+      programStartAddress(0),
+      programLoaded(false)
 {
 }
 
@@ -31,7 +33,7 @@ void Menu::start()
     {
         showMenu();
 
-        const int choice = readInt("Choose an option: ", 1, 4);
+        const int choice = readInt("Choose an option: ", 1, 5);
 
         try
         {
@@ -42,14 +44,18 @@ void Menu::start()
                     break;
 
                 case 2:
-                    runProgramFlow();
+                    loadProgramFileFlow();
                     break;
 
                 case 3:
-                    stepProgramFlow();
+                    runProgramFlow();
                     break;
 
                 case 4:
+                    stepProgramFlow();
+                    break;
+
+                case 5:
                     quit = true;
                     break;
 
@@ -69,10 +75,11 @@ void Menu::start()
 void Menu::showMenu()
 {
     std::cout << "\n----------------------- MENU ------------------------\n"
-              << "  1. Load new program\n"
-              << "  2. Run program as a whole\n"
-              << "  3. Run step by step\n"
-              << "  4. Exit program\n"
+              << "  1. Load new program (type instructions)\n"
+              << "  2. Load program from a file\n"
+              << "  3. Run program as a whole\n"
+              << "  4. Run step by step\n"
+              << "  5. Exit program\n"
               << "-----------------------------------------------------\n";
 }
 
@@ -137,6 +144,8 @@ void Menu::loadNewProgramFlow()
     // A new program replaces whatever was in the machine before.
     machine.reset();
     entryAddress = 0;
+    programStartAddress = 0;
+    programLoaded = false;
 
     enterInstructionsFlow();
 
@@ -146,9 +155,47 @@ void Menu::loadNewProgramFlow()
         return;
     }
 
+    programLoaded = true;
+
     std::cout << "Program loaded: " << (entryAddress / 2)
               << " instruction(s) from 0000 to " << hexWord(entryAddress - 2)
-              << ".\nChoose 2 to run it or 3 to run it step by step.\n";
+              << ".\nChoose 3 to run it or 4 to run it step by step.\n";
+}
+
+void Menu::loadProgramFileFlow()
+{
+    std::cout << "\nLoading a program from a file...\n";
+
+    const std::string fileName = trim(readLine("Enter the program file path: "));
+    if (fileName.empty())
+    {
+        std::cout << "No file name entered.\n";
+        return;
+    }
+
+    const std::string addressText =
+        trim(readLine("Enter the start address in hex (even, 00-FE, default 00): "));
+
+    int startAddress = 0;
+    if (!addressText.empty())
+    {
+        startAddress = parseHexValue(addressText);
+    }
+
+    // VoleMachine reads and validates the whole file before resetting, so a
+    // bad file leaves the current program untouched.
+    machine.loadProgramFile(fileName, startAddress);
+
+    programStartAddress = startAddress;
+    entryAddress = startAddress;
+    programLoaded = true;
+
+    std::cout << "Program loaded from \"" << fileName << "\" at address "
+              << hexWord(startAddress) << ".\n"
+              << "PC = " << hexWord(machine.getControlUnit().getPC())
+              << ".\nChoose 3 to run it or 4 to run it step by step.\n";
+
+    displayState();
 }
 
 void Menu::enterInstructionsFlow()
@@ -217,14 +264,14 @@ void Menu::enterInstructionsFlow()
 
 void Menu::runProgramFlow()
 {
-    if (entryAddress == 0)
+    if (!programLoaded)
     {
-        std::cout << "No program has been loaded yet. Choose option 1 first.\n";
+        std::cout << "No program has been loaded yet. Choose option 1 or 2 first.\n";
         return;
     }
 
-    // Start from the first instruction.
-    machine.getControlUnit().setPC(0);
+    // Start from the first instruction of the loaded program.
+    machine.getControlUnit().setPC(programStartAddress);
     machine.start();
 
     std::cout << "\nRunning program as a whole...\n";
@@ -236,14 +283,14 @@ void Menu::runProgramFlow()
 
 void Menu::stepProgramFlow()
 {
-    if (entryAddress == 0)
+    if (!programLoaded)
     {
-        std::cout << "No program has been loaded yet. Choose option 1 first.\n";
+        std::cout << "No program has been loaded yet. Choose option 1 or 2 first.\n";
         return;
     }
 
-    // Start from the first instruction.
-    machine.getControlUnit().setPC(0);
+    // Start from the first instruction of the loaded program.
+    machine.getControlUnit().setPC(programStartAddress);
     machine.start();
 
     while (machine.isRunning())
@@ -312,6 +359,33 @@ std::string Menu::trim(const std::string &text)
 
     const std::size_t last = text.find_last_not_of(" \t\r\n");
     return text.substr(first, last - first + 1);
+}
+
+int Menu::parseHexValue(const std::string &text)
+{
+    if (text.empty())
+    {
+        throw std::invalid_argument("Empty hex value.");
+    }
+
+    std::size_t used = 0;
+    long value = 0;
+
+    try
+    {
+        value = std::stol(text, &used, 16);
+    }
+    catch (const std::exception &)
+    {
+        throw std::invalid_argument("Invalid hex value: " + text);
+    }
+
+    if (used != text.size() || value < 0 || value > 0xFFFF)
+    {
+        throw std::invalid_argument("Invalid hex value: " + text);
+    }
+
+    return static_cast<int>(value);
 }
 
 std::string Menu::hexByte(int value)
