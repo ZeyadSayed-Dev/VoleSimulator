@@ -42,6 +42,7 @@ public:
     void setPC(int address);
 
     int getIR() const;
+    void setIR(int value);
 
     int* getDecodedOperands();
 };
