@@ -110,6 +110,21 @@ void VoleMachine::start()
     running = true;
 }
 
+void VoleMachine::loadProgramFile(const std::string &fileName, int startAddress)
+{
+    // Read and validate first: if anything is wrong, the current machine state
+    // is left untouched.
+    ProgramLoader loader;
+    const std::vector<uint8_t> programBytes = loader.readProgramFile(fileName);
+    loader.validateProgram(programBytes, startAddress);
+
+    reset();
+    loader.loadProgram(memory, programBytes, startAddress);
+
+    controlUnit.setPC(startAddress);
+    controlUnit.setIR(0);
+}
+
 void VoleMachine::reset()
 {
     memory.clear();
