@@ -27,6 +27,11 @@ public:
     // Marks the machine as ready to execute (used before run/step).
     void start();
 
+    // Loads a program from a text file at an even start address.
+    // The file is fully parsed and validated before the machine is reset, so a bad file
+    // never leaves a half-loaded program behind. PC is set to startAddress.
+    void loadProgramFile(const std::string &fileName, int startAddress = 0);
+
     void reset();
     void halt();
 
