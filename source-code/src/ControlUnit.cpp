@@ -167,6 +167,11 @@ int ControlUnit::getIR() const
     return ir;
 }
 
+void ControlUnit::setIR(int value)
+{
+    ir = value;
+}
+
 void ControlUnit::setPC(int address)
 {
     pc = address;
