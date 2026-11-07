@@ -1,16 +1,5 @@
-#include "Menu.h"
-#include "ALU.cpp"
-#include "Storage.cpp"
-#include "Utilities.cpp"
-#include "ControlUnit.cpp"
-#include "Menu.cpp"
-#include "VoleMachine.cpp"
+#include <iostream>
 
-int main()
-{
-    Menu menu;
-
-    menu.start();
-
+int main() {
     return 0;
 }
