@@ -2,13 +2,13 @@
 #define INSTRUCTIONFACTORY_HPP
 
 #include <string>
-#include "Instruction.hpp"
+
 #include "Instructions.hpp"
-using namespace std;
+
 class InstructionFactory
 {
 public:
-    Instruction *getInstruction(const string &code)
+    Instruction *getInstruction(const std::string &code)
     {
         if (code == "1")
         {
@@ -46,18 +46,19 @@ public:
         {
             return new BitwiseXOR();
         }
-        else if (code == "A" || opcode == "a")
+        else if (code == "A" || code == "a")
         {
             return new RotateRight();
         }
-        else if (code == "B" || opcode == "b")
+        else if (code == "B" || code == "b")
         {
             return new Jump();
         }
-        else if (code == "C" || opcode == "c")
+        else if (code == "C" || code == "c")
         {
             return new Halt();
         }
+
         return nullptr;
     }
 };

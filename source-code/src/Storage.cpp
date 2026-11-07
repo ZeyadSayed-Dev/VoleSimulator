@@ -1,7 +1,7 @@
 #include "Storage.h"
 
 void Memory::checkAddress(int address) {
-    if (address < 0 || address >= CellMem.size()) {
+    if (address < 0 || address >= static_cast<int>(CellMem.size())) {
         throw std::out_of_range("Address is out of range");
     }
 }
@@ -27,20 +27,17 @@ void Memory::clear() {
 Register::Register(int size) : CellReg(size, 0) {}
 
 uint8_t Register::read(int address) {
-    if (address < 0 || address >= CellReg.size()) {
+    if (address < 0 || address >= static_cast<int>(CellReg.size())) {
         throw std::out_of_range("Address is out of range");
     }
-    if (address == 0)
-        return 0;
     return CellReg[address];
 }
 
 void Register::write(int address, uint8_t value) {
-    if (address < 0 || address >= CellReg.size()) {
+    if (address < 0 || address >= static_cast<int>(CellReg.size())) {
         throw std::out_of_range("Address is out of range");
     }
-    if (address != 0)
-        CellReg[address] = value;
+    CellReg[address] = value;
 }
 
 void Register::clear() {
