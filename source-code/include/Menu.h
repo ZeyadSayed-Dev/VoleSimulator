@@ -15,11 +15,14 @@ public:
 private:
     VoleMachine machine;
     int entryAddress;
+    int programStartAddress;
+    bool programLoaded;
 
     void showMenu();
     void displayState();
 
     void loadNewProgramFlow();
+    void loadProgramFileFlow();
     void enterInstructionsFlow();
     void runProgramFlow();
     void stepProgramFlow();
@@ -27,6 +30,7 @@ private:
     static std::string readLine(const std::string &prompt);
     static int readInt(const std::string &prompt, int min, int max);
     static std::string trim(const std::string &text);
+    static int parseHexValue(const std::string &text);
     static std::string hexByte(int value);
     static std::string hexWord(int value);
 };
