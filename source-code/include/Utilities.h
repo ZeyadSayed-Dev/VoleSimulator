@@ -22,6 +22,10 @@ class ProgramLoader {
 public:
     void loadProgram(IMethodOperations& storage, const vector<uint8_t>& programBytes, int startAddress = 0);
     void clear(IMethodOperations& storage);
+    vector<uint8_t> parseProgramText(const string& text) const;
+    vector<uint8_t> readProgramFile(const string& fileName) const;
+    void validateProgram(const vector<uint8_t>& programBytes, int startAddress) const;
+    void loadProgramFile(IMethodOperations& storage, const string& fileName, int startAddress = 0);
 };
 
 #endif
