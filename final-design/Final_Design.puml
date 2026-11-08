@@ -1,0 +1,312 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam shadowing false
+hide circle
+hide empty members
+
+' ============================================================
+' Console user interface
+' ============================================================
+class Menu {
+  - machine: VoleMachine
+  - entryAddress: int
+  - programStartAddress: int
+  - programLoaded: bool
+  + Menu()
+  + start(): void
+  - showMenu(): void
+  - displayState(): void
+  - loadNewProgramFlow(): void
+  - loadProgramFileFlow(): void
+  - enterInstructionsFlow(): void
+  - runProgramFlow(): void
+  - stepProgramFlow(): void
+  - {static} readLine(prompt: const string&): string
+  - {static} readInt(prompt: const string&, min: int, max: int): int
+  - {static} trim(text: const string&): string
+  - {static} parseHexValue(text: const string&): int
+  - {static} hexByte(value: int): string
+  - {static} hexWord(value: int): string
+}
+
+note top of Menu
+  Entry point (main.cpp):
+  int main()
+  {
+      Menu menu;
+      menu.start();
+      return 0;
+  }
+end note
+
+note bottom of Menu
+  Menu:
+  1) Load new program (type instructions)
+  2) Load program from a file
+  3) Run program as a whole
+  4) Run step by step
+  5) Exit program
+end note
+
+' ============================================================
+' Machine
+' ============================================================
+class VoleMachine {
+  - memory: Memory
+  - registerFile: Register
+  - alu: ALU
+  - inputOutput: OutputAndInput
+  - instructionFactory: InstructionFactory
+  - context: MachineContext
+  - controlUnit: ControlUnit
+  - running: bool
+  - screen: string
+  + VoleMachine()
+  + step(): void
+  + run(): void
+  + start(): void
+  + loadProgramFile(fileName: const string&, startAddress: int = 0): void
+  + reset(): void
+  + halt(): void
+  + isRunning(): bool
+  + isHalted(): bool
+  + getRegisterFile(): Register&
+  + getMemory(): Memory&
+  + getALU(): ALU&
+  + getControlUnit(): ControlUnit&
+  + getInputOutput(): OutputAndInput&
+  + getScreen(): const string&
+  - handleScreenWrite(rawInstruction: uint16_t): void
+}
+
+' ============================================================
+' Storage
+' ============================================================
+interface IMethodOperations {
+  + read(address: int): uint8_t
+  + write(address: int, value: uint8_t): void
+  + clear(): void
+  + ~IMethodOperations()
+}
+
+class Memory {
+  - CellMem: vector~uint8_t~
+  + Memory(size: int = 256)
+  + write(address: int, value: uint8_t): void
+  + read(address: int): uint8_t
+  + clear(): void
+  - checkAddress(address: int): void
+}
+
+class Register {
+  - CellReg: vector~uint8_t~
+  + Register(size: int = 16)
+  + read(address: int): uint8_t
+  + write(address: int, value: uint8_t): void
+  + clear(): void
+}
+
+' ============================================================
+' Control unit
+' ============================================================
+class ControlUnit {
+  - pc: int
+  - ir: int
+  - decodedOperands: int[3]
+  - memory: Memory&
+  - instructionFactory: InstructionFactory&
+  - context: MachineContext&
+  + ControlUnit(memory: Memory&, instructionFactory: InstructionFactory&, context: MachineContext&)
+  + fetch(): void
+  + validate(rawInstruction: uint16_t): bool
+  + decode(rawInstruction: uint16_t): Instruction*
+  + execute(instruction: Instruction*): void
+  + updatePC(address: int): void
+  + getPC(): int
+  + setPC(address: int): void
+  + getIR(): int
+  + setIR(value: int): void
+  + getDecodedOperands(): int*
+}
+
+' ============================================================
+' ALU
+' ============================================================
+class ALU {
+  + addInteger(a: uint8_t, b: uint8_t): uint8_t
+  + addFloatingPoint(a: uint8_t, b: uint8_t): uint8_t
+  + bitwiseAND(a: uint8_t, b: uint8_t): uint8_t
+  + bitwiseOR(a: uint8_t, b: uint8_t): uint8_t
+  + bitwiseXOR(a: uint8_t, b: uint8_t): uint8_t
+  + rotateRight(value: uint8_t, count: int): uint8_t
+}
+
+' ============================================================
+' Shared execution context
+' ============================================================
+class MachineContext {
+  - memory: Memory&
+  - registerFile: Register&
+  - alu: ALU&
+  - inputOutput: OutputAndInput&
+  - controlUnit: ControlUnit*
+  + MachineContext(memory: Memory&, registerFile: Register&, alu: ALU&, inputOutput: OutputAndInput&)
+  + setControlUnit(controlUnit: ControlUnit&): void
+  + getRegisterFile(): Register&
+  + getMemory(): Memory&
+  + getALU(): ALU&
+  + getControlUnit(): ControlUnit&
+  + getInputOutput(): OutputAndInput&
+}
+
+' ============================================================
+' Input / output and program loading utilities
+' ============================================================
+class OutputAndInput {
+  - input: string
+  - output: string
+  + write(out: const string&): void
+  + read(): string
+  + clear(): void
+}
+
+class ProgramLoader {
+  + loadProgram(storage: IMethodOperations&, programBytes: const vector~uint8_t~&, startAddress: int = 0): void
+  + clear(storage: IMethodOperations&): void
+  + parseProgramText(text: const string&): vector~uint8_t~
+  + readProgramFile(fileName: const string&): vector~uint8_t~
+  + validateProgram(programBytes: const vector~uint8_t~&, startAddress: int): void
+  + loadProgramFile(storage: IMethodOperations&, fileName: const string&, startAddress: int = 0): void
+}
+note right of ProgramLoader
+  Ignore everything after ';'.
+  Every 4 hex digits (0-9, A-F) become
+  one 16-bit instruction (high byte first).
+  Validates hex, complete groups, empty
+  programs, even start address in 00..FE,
+  and that the program fits in memory.
+end note
+
+' ============================================================
+' Instruction hierarchy
+' ============================================================
+interface Instruction {
+  + execute(context: MachineContext&): void
+  + ~Instruction()
+}
+
+class InstructionFactory {
+  + getInstruction(code: const string&): Instruction*
+}
+note right of InstructionFactory
+  getInstruction() keeps one static instruction
+  instance per opcode and returns a pointer to it.
+end note
+
+class LoadFromMemory {
+  + execute(context: MachineContext&): void
+}
+
+class LoadImmediate {
+  + execute(context: MachineContext&): void
+}
+
+class Store {
+  + execute(context: MachineContext&): void
+}
+
+class Move {
+  + execute(context: MachineContext&): void
+}
+
+class AddInteger {
+  + execute(context: MachineContext&): void
+}
+
+class AddFloatingPoint {
+  + execute(context: MachineContext&): void
+}
+
+class BitwiseOR {
+  + execute(context: MachineContext&): void
+}
+
+class BitwiseAND {
+  + execute(context: MachineContext&): void
+}
+
+class BitwiseXOR {
+  + execute(context: MachineContext&): void
+}
+
+class RotateRight {
+  + execute(context: MachineContext&): void
+}
+
+class Jump {
+  + execute(context: MachineContext&): void
+}
+
+class Halt {
+  + execute(context: MachineContext&): void
+}
+
+' ============================================================
+' Relationships
+' ============================================================
+
+' Menu owns the machine it drives.
+Menu *-- VoleMachine
+
+' VoleMachine uses ProgramLoader to read, validate and load program files.
+VoleMachine ..> ProgramLoader : uses to load program files
+
+' VoleMachine owns every hardware component by value.
+VoleMachine *-- Memory
+VoleMachine *-- Register
+VoleMachine *-- ALU
+VoleMachine *-- OutputAndInput
+VoleMachine *-- InstructionFactory
+VoleMachine *-- MachineContext
+VoleMachine *-- ControlUnit
+
+' ControlUnit references the memory, the factory and the shared context.
+ControlUnit --> Memory : reads instruction bytes
+ControlUnit --> InstructionFactory : obtains instruction object
+ControlUnit --> MachineContext : executes with
+ControlUnit ..> Instruction : fetch / decode / dispatch
+
+' MachineContext references the hardware and points back to ControlUnit.
+MachineContext --> Memory
+MachineContext --> Register
+MachineContext --> ALU
+MachineContext --> OutputAndInput
+MachineContext --> ControlUnit : pointer, wired after construction
+
+' Memory and Register implement the common storage interface.
+IMethodOperations <|.. Memory
+IMethodOperations <|.. Register
+
+' ProgramLoader writes byte arrays into any IMethodOperations.
+ProgramLoader ..> IMethodOperations : loads byte arrays
+
+' Factory creates and caches one instruction per opcode.
+InstructionFactory ..> Instruction : creates and caches
+
+' Every instruction executes against the shared context.
+Instruction ..> MachineContext : uses
+Instruction <|.. LoadFromMemory
+Instruction <|.. LoadImmediate
+Instruction <|.. Store
+Instruction <|.. Move
+Instruction <|.. AddInteger
+Instruction <|.. AddFloatingPoint
+Instruction <|.. BitwiseOR
+Instruction <|.. BitwiseAND
+Instruction <|.. BitwiseXOR
+Instruction <|.. RotateRight
+Instruction <|.. Jump
+Instruction <|.. Halt
+
+@enduml
