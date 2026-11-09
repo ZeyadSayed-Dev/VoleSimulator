@@ -34,7 +34,10 @@ VoleMachine::VoleMachine()
       context(memory, registerFile, alu, inputOutput),
       controlUnit(memory, instructionFactory, context),
       running(false),
-      screen()
+      screenFormat(ScreenFormat::Decimal),
+      screenBytes(),
+      screenText(),
+      screenTextDirty(false)
 {
     // ControlUnit and MachineContext reference each other, so the pointer is
     // wired after both objects exist.
@@ -135,7 +138,9 @@ void VoleMachine::reset()
     controlUnit.setIR(0);
 
     running = false;
-    screen.clear();
+    screenBytes.clear();
+    screenText.clear();
+    screenTextDirty = false;
 }
 
 void VoleMachine::halt()
@@ -181,7 +186,83 @@ OutputAndInput &VoleMachine::getInputOutput()
 
 const std::string &VoleMachine::getScreen() const
 {
-    return screen;
+    if (screenTextDirty)
+    {
+        rebuildScreenText();
+    }
+    return screenText;
+}
+
+const std::vector<uint8_t> &VoleMachine::getScreenBytes() const
+{
+    return screenBytes;
+}
+
+void VoleMachine::setScreenFormat(ScreenFormat format)
+{
+    if (screenFormat == format)
+    {
+        return;
+    }
+
+    screenFormat = format;
+    screenTextDirty = true;
+}
+
+ScreenFormat VoleMachine::getScreenFormat() const
+{
+    return screenFormat;
+}
+
+std::string VoleMachine::formatScreenByte(uint8_t value) const
+{
+    static const char digits[] = "0123456789ABCDEF";
+
+    switch (screenFormat)
+    {
+        case ScreenFormat::Hex:
+        {
+            // Render the shortest hex form: 10..15 must show as A..F rather
+            // than 0A..0F, so the high nibble is only printed when it is not 0.
+            std::string text;
+            if (value > 0x0F)
+            {
+                text += digits[(value >> 4) & 0x0F];
+            }
+            text += digits[value & 0x0F];
+            return text;
+        }
+
+        case ScreenFormat::Ascii:
+        {
+            // Printable ASCII is shown as the character itself. Other bytes are
+            // kept visible as an escape so no output is silently lost.
+            if (value >= 0x20 && value <= 0x7E)
+            {
+                return std::string(1, static_cast<char>(value));
+            }
+
+            std::string text = "\\x";
+            text += digits[(value >> 4) & 0x0F];
+            text += digits[value & 0x0F];
+            return text;
+        }
+
+        case ScreenFormat::Decimal:
+        default:
+            return std::to_string(static_cast<unsigned int>(value));
+    }
+}
+
+void VoleMachine::rebuildScreenText() const
+{
+    screenText.clear();
+    for (const uint8_t value : screenBytes)
+    {
+        screenText += formatScreenByte(value);
+        screenText += '\n';
+    }
+    screenTextDirty = false;
 }
 
 void VoleMachine::handleScreenWrite(uint16_t rawInstruction)
@@ -201,12 +282,11 @@ void VoleMachine::handleScreenWrite(uint16_t rawInstruction)
         return;
     }
 
-    // The screen displays the numeric value that was stored (for example
-    // storing 19 shows "19", and storing 1 shows "1").
-    const std::string rendered = std::to_string(static_cast<unsigned int>(memory.read(0xFF)));
+    // Keep the raw byte so the screen can be re-rendered when the format
+    // changes; the text itself is built lazily by getScreen().
+    const uint8_t value = memory.read(0xFF);
+    screenBytes.push_back(value);
+    screenTextDirty = true;
 
-    screen += rendered;
-    screen += '\n';
-
-    std::cout << rendered << '\n' << std::flush;
+    std::cout << formatScreenByte(value) << '\n' << std::flush;
 }

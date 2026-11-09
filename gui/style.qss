@@ -1,0 +1,288 @@
+/* --------------------------------------------------------------------------
+   Vole Machine Simulator - dark theme
+   -------------------------------------------------------------------------- */
+
+QWidget {
+    color: #dbe5f1;
+    font-size: 13px;
+}
+
+QMainWindow, QDialog {
+    background-color: #0f141b;
+}
+
+/* ----- Menu bar ---------------------------------------------------------- */
+
+QMenuBar {
+    background-color: #121821;
+    border-bottom: 1px solid #1f2937;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 6px 10px;
+}
+
+QMenuBar::item:selected {
+    background-color: #1e293b;
+    border-radius: 4px;
+}
+
+QMenu {
+    background-color: #121821;
+    border: 1px solid #263244;
+    padding: 6px;
+}
+
+QMenu::item {
+    padding: 6px 24px 6px 12px;
+    border-radius: 4px;
+}
+
+QMenu::item:selected {
+    background-color: #1d4ed8;
+    color: #ffffff;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #263244;
+    margin: 6px 4px;
+}
+
+/* ----- Tool bar ---------------------------------------------------------- */
+
+QToolBar#mainToolBar {
+    background-color: #121821;
+    border: none;
+    border-bottom: 1px solid #1f2937;
+    padding: 6px 10px;
+    spacing: 6px;
+}
+
+QToolBar#mainToolBar QToolButton {
+    background-color: #17202c;
+    border: 1px solid #263244;
+    border-radius: 6px;
+    padding: 5px 9px;
+    color: #cbd5e1;
+}
+
+QToolBar#mainToolBar QToolButton:hover {
+    background-color: #1e2a3a;
+    border-color: #334155;
+}
+
+QToolBar#mainToolBar QToolButton:pressed {
+    background-color: #0f172a;
+}
+
+QToolBar#mainToolBar QToolButton:disabled {
+    color: #64748b;
+    border-color: #1e293b;
+}
+
+QLabel#toolbarLabel {
+    color: #8ea3bd;
+    padding: 0 2px 0 12px;
+}
+
+/* ----- Status bar -------------------------------------------------------- */
+
+QStatusBar {
+    background-color: #0c1117;
+    color: #8ea3bd;
+    border-top: 1px solid #1f2937;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+/* ----- Group boxes ------------------------------------------------------- */
+
+QGroupBox {
+    background-color: #121821;
+    border: 1px solid #223042;
+    border-radius: 10px;
+    margin-top: 14px;
+    padding: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 12px;
+    padding: 0 6px;
+    color: #7dd3fc;
+    font-weight: 600;
+}
+
+/* ----- Input widgets ----------------------------------------------------- */
+
+QPlainTextEdit, QTextEdit, QLineEdit, QComboBox, QTableWidget {
+    background-color: #0b1016;
+    border: 1px solid #223042;
+    border-radius: 6px;
+    selection-background-color: #1d4ed8;
+    selection-color: #ffffff;
+}
+
+QPlainTextEdit:focus, QTextEdit:focus, QLineEdit:focus,
+QComboBox:focus, QTableWidget:focus {
+    border: 1px solid #2dd4bf;
+}
+
+QLineEdit {
+    padding: 4px 8px;
+}
+
+QComboBox {
+    padding: 4px 8px;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 18px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #121821;
+    border: 1px solid #223042;
+    selection-background-color: #1d4ed8;
+}
+
+QPlainTextEdit#programEditor,
+QPlainTextEdit#screenView,
+QTableWidget#memoryTable,
+QTableWidget#registerTable {
+    font-family: "Consolas";
+    font-size: 12px;
+}
+
+/* ----- Buttons ----------------------------------------------------------- */
+
+QPushButton {
+    background-color: #1d4ed8;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #2563eb;
+}
+
+QPushButton:pressed {
+    background-color: #1e40af;
+}
+
+QPushButton:disabled {
+    background-color: #1e293b;
+    color: #64748b;
+}
+
+/* ----- Tables ------------------------------------------------------------ */
+
+QHeaderView::section {
+    background-color: #151e2a;
+    color: #93a7c0;
+    border: none;
+    border-right: 1px solid #1f2937;
+    border-bottom: 1px solid #1f2937;
+    padding: 4px;
+    font-weight: 600;
+}
+
+QTableWidget {
+    gridline-color: #1a2432;
+}
+
+QTableWidget::item {
+    padding: 1px;
+}
+
+QTableWidget::item:selected {
+    background-color: #1d4ed8;
+    color: #ffffff;
+}
+
+/* ----- Scroll bars ------------------------------------------------------- */
+
+QScrollBar:vertical {
+    background: #0b1016;
+    width: 12px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background: #2a3a4f;
+    border-radius: 6px;
+    min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #3b506b;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QScrollBar:horizontal {
+    background: #0b1016;
+    height: 12px;
+    margin: 0;
+}
+
+QScrollBar::handle:horizontal {
+    background: #2a3a4f;
+    border-radius: 6px;
+    min-width: 24px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #3b506b;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+
+/* ----- Processor state labels ------------------------------------------- */
+
+QLabel#stateCaption {
+    color: #7d8ea6;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+QLabel#stateValue {
+    font-family: "Consolas";
+    font-size: 16px;
+    font-weight: 700;
+    color: #e2e8f0;
+}
+
+QLabel#instructionValue {
+    font-family: "Consolas";
+    font-size: 13px;
+    color: #7dd3fc;
+}
+
+QLabel#hintLabel {
+    color: #6b7f99;
+    font-size: 11px;
+}
+
+/* ----- Tooltips ---------------------------------------------------------- */
+
+QToolTip {
+    background-color: #111827;
+    color: #dbe5f1;
+    border: 1px solid #334155;
+    padding: 4px;
+}

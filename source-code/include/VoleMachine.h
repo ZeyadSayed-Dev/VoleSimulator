@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "ALU.h"
 #include "ControlUnit.h"
@@ -10,6 +11,14 @@
 #include "Storage.h"
 #include "Utilities.h"
 #include "instructionFactory.hpp"
+
+// How values written to the screen address (FF) are rendered as text.
+enum class ScreenFormat
+{
+    Hex,      // Two uppercase hex digits: 0F, FC, 2A
+    Decimal,  // Plain decimal number: 15, 252, 42
+    Ascii     // Printable character, non-printable bytes as \xNN
+};
 
 // Owns every hardware component of the simulated Vole machine and drives the
 // fetch -> validate -> decode -> execute cycle.
@@ -45,9 +54,22 @@ public:
     OutputAndInput &getInputOutput();
     const std::string &getScreen() const;
 
+    // Raw bytes written to the screen address, in write order.
+    const std::vector<uint8_t> &getScreenBytes() const;
+
+    // Selects how getScreen() renders the bytes above.
+    void setScreenFormat(ScreenFormat format);
+    ScreenFormat getScreenFormat() const;
+
 private:
     // Handles the "write to address FF is writing to the screen" mapping.
     void handleScreenWrite(uint16_t rawInstruction);
+
+    // Renders one screen byte using the current ScreenFormat.
+    std::string formatScreenByte(uint8_t value) const;
+
+    // Rebuilds the cached text returned by getScreen().
+    void rebuildScreenText() const;
 
     Memory memory;
     Register registerFile;
@@ -58,7 +80,10 @@ private:
     ControlUnit controlUnit;
 
     bool running;
-    std::string screen;
+    ScreenFormat screenFormat;
+    std::vector<uint8_t> screenBytes;
+    mutable std::string screenText;
+    mutable bool screenTextDirty;
 };
 
 #endif

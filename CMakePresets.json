@@ -1,0 +1,46 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "gui-debug",
+      "displayName": "GUI - Qt 6 / MinGW Debug",
+      "description": "Builds the Qt 6 GUI (GUI-only repository)",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build/gui-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.12.0/mingw_64",
+        "CMAKE_CXX_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/g++.exe",
+        "CMAKE_MAKE_PROGRAM": "C:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe"
+      }
+    },
+    {
+      "name": "gui-release",
+      "displayName": "GUI - Qt 6 / MinGW Release",
+      "inherits": "gui-debug",
+      "binaryDir": "${sourceDir}/build/gui-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "gui-debug",
+      "displayName": "Build vole_gui (Debug)",
+      "configurePreset": "gui-debug",
+      "targets": [ "vole_gui" ]
+    },
+    {
+      "name": "gui-release",
+      "displayName": "Build vole_gui (Release)",
+      "configurePreset": "gui-release",
+      "targets": [ "vole_gui" ]
+    }
+  ]
+}
